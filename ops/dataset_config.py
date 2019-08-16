@@ -5,7 +5,7 @@
 
 import os
 
-ROOT_DATASET = '/ssd/video/'  # '/data/jilin/'
+ROOT_DATASET = '/media/nas-570-002-nfssamba/rsanford/activity_recognition/'  # '/data/jilin/'
 
 
 def return_ucf101(modality):
@@ -99,6 +99,17 @@ def return_kinetics(modality):
     else:
         raise NotImplementedError('no such modality:' + modality)
     return filename_categories, filename_imglist_train, filename_imglist_val, root_data, prefix
+
+def return_collective(modality):
+    filename_categories = 6
+    if modality == 'RGB':
+        root_data = ROOT_DATASET + 'collective_dataset/'
+        filename_imglist = 'kinetics/labels/train_videofolder.txt'
+        filename_imglist_val = 'kinetics/labels/val_videofolder.txt'
+        prefix = 'img_{:05d}.jpg'
+    else:
+        raise NotImplementedError('no such modality:' + modality)
+
 
 
 def return_dataset(dataset, modality):

@@ -5,12 +5,10 @@
 
 import argparse
 parser = argparse.ArgumentParser(description="PyTorch implementation of Temporal Segment Networks")
-parser.add_argument('dataset', type=str)
-parser.add_argument('modality', type=str, choices=['RGB', 'Flow'])
-parser.add_argument('--train_list', type=str, default="")
-parser.add_argument('--val_list', type=str, default="")
-parser.add_argument('--root_path', type=str, default="")
-parser.add_argument('--store_name', type=str, default="")
+parser.add_argument('--num_class', type=int, default=6)
+parser.add_argument('--dataset', type=str, default="collective")
+parser.add_argument('--modality', type=str, default="RGB")
+parser.add_argument('--store_name', type=str, default="test")
 # ========================= Model Configs ==========================
 parser.add_argument('--arch', type=str, default="BNInception")
 parser.add_argument('--num_segments', type=int, default=3)

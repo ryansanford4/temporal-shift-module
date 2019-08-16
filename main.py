@@ -11,7 +11,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 from torch.nn.utils import clip_grad_norm_
 
-from ops.dataset import TSNDataSet
+from ops.collective_dataset import collective_read_dataset, collective_all_frames, CollectiveDataset
 from ops.models import TSN
 from ops.transforms import *
 from opts import parser
@@ -28,15 +28,15 @@ def main():
     global args, best_prec1
     args = parser.parse_args()
 
-    num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,
-                                                                                                      args.modality)
+    # num_class, args.train_list, args.val_list, args.root_path, prefix = dataset_config.return_dataset(args.dataset,
+                                                                                                    #   args.modality)?
     full_arch_name = args.arch
     if args.shift:
         full_arch_name += '_shift{}_{}'.format(args.shift_div, args.shift_place)
     if args.temporal_pool:
         full_arch_name += '_tpool'
     args.store_name = '_'.join(
-        ['TSM', args.dataset, args.modality, full_arch_name, args.consensus_type, 'segment%d' % args.num_segments,
+        ['TSM', args.modality, full_arch_name, args.consensus_type, 'segment%d' % args.num_segments,
          'e{}'.format(args.epochs)])
     if args.pretrain != 'imagenet':
         args.store_name += '_{}'.format(args.pretrain)
@@ -52,7 +52,7 @@ def main():
 
     check_rootfolders()
 
-    model = TSN(num_class, args.num_segments, args.modality,
+    model = TSN(args.num_class, args.num_segments, args.modality,
                 base_model=args.arch,
                 consensus_type=args.consensus_type,
                 dropout=args.dropout,
@@ -138,36 +138,20 @@ def main():
     elif args.modality in ['Flow', 'RGBDiff']:
         data_length = 5
 
-    train_loader = torch.utils.data.DataLoader(
-        TSNDataSet(args.root_path, args.train_list, num_segments=args.num_segments,
-                   new_length=data_length,
-                   modality=args.modality,
-                   image_tmpl=prefix,
-                   transform=torchvision.transforms.Compose([
-                       train_augmentation,
-                       Stack(roll=(args.arch in ['BNInception', 'InceptionV3'])),
-                       ToTorchFormatTensor(div=(args.arch not in ['BNInception', 'InceptionV3'])),
-                       normalize,
-                   ]), dense_sample=args.dense_sample),
-        batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True,
-        drop_last=True)  # prevent something not % n_GPU
+    data_path='/media/nas-570-002-nfssamba/rsanford/activity_recognition/collective_dataset'  #data path for the collective dataset
+    test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29]
+    train_seqs=[s for s in range(1,45) if s not in test_seqs]
 
-    val_loader = torch.utils.data.DataLoader(
-        TSNDataSet(args.root_path, args.val_list, num_segments=args.num_segments,
-                   new_length=data_length,
-                   modality=args.modality,
-                   image_tmpl=prefix,
-                   random_shift=False,
-                   transform=torchvision.transforms.Compose([
-                       GroupScale(int(scale_size)),
-                       GroupCenterCrop(crop_size),
-                       Stack(roll=(args.arch in ['BNInception', 'InceptionV3'])),
-                       ToTorchFormatTensor(div=(args.arch not in ['BNInception', 'InceptionV3'])),
-                       normalize,
-                   ]), dense_sample=args.dense_sample),
-        batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+    train_anns = collective_read_dataset(data_path, train_seqs)
+    train_frames = collective_all_frames(train_anns)
+
+    test_anns=collective_read_dataset(data_path, test_seqs)
+    test_frames=collective_all_frames(test_anns)
+
+    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (720, 1280), is_training=True),
+                                            batch_size=8, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (720, 1280), is_training=True),
+                                        batch_size=8, shuffle=False)
 
     # define loss function (criterion) and optimizer
     if args.loss_type == 'nll':
