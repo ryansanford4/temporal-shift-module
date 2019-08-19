@@ -165,6 +165,6 @@ class CollectiveDataset(data.Dataset):
         
         #convert to pytorch tensor
         images=torch.from_numpy(images).float()
-        activities=torch.from_numpy(activities).long()
+        # activities=torch.from_numpy(activities).long()
         
         return images, activities
