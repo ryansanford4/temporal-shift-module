@@ -72,6 +72,8 @@ def main():
     train_augmentation = model.get_augmentation(flip=False if 'something' in args.dataset or 'jester' in args.dataset else True)
 
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
+    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # model = model.cuda()
 
     optimizer = torch.optim.SGD(policies,
                                 args.lr,
@@ -148,10 +150,10 @@ def main():
     test_anns=collective_read_dataset(data_path, test_seqs)
     test_frames=collective_all_frames(test_anns)
 
-    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (720, 1280), is_training=True),
-                                            batch_size=8, shuffle=False)
-    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (720, 1280), is_training=True),
-                                        batch_size=8, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_segments, is_training=True),
+                                            batch_size=args.batch_size, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_segments, is_training=True),
+                                        batch_size=args.batch_size, shuffle=False)
 
     # define loss function (criterion) and optimizer
     if args.loss_type == 'nll':
@@ -226,6 +228,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
 
         # compute output
         output = model(input_var)
+        target_var = torch.squeeze(target_var)
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss

@@ -110,8 +110,6 @@ def return_collective(modality):
     else:
         raise NotImplementedError('no such modality:' + modality)
 
-
-
 def return_dataset(dataset, modality):
     dict_single = {'jester': return_jester, 'something': return_something, 'somethingv2': return_somethingv2,
                    'ucf101': return_ucf101, 'hmdb51': return_hmdb51,
