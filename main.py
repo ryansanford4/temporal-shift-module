@@ -228,8 +228,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
         target = target.cuda()
         input_var = torch.autograd.Variable(input)
         target_var = torch.autograd.Variable(target)
-        
-        for j, batch in enumerate(input):
+        for j, batch in enumerate(input_var):
             tf_writer.add_image('training_image', qc_image(batch), epoch*i*j)
 
         # compute output
