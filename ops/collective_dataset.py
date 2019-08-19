@@ -155,12 +155,13 @@ class CollectiveDataset(data.Dataset):
             img=img.transpose(2,0,1)
             images.append(img)
             
-            
-            activities.append(self.anns[sid][src_fid]['group_activity'])
+            # Only save the activity in the first frame. That is what we want to classify.
+            if i == 0:
+                activities = self.anns[sid][src_fid]['group_activity']
         
         
         images = np.stack(images)
-        activities = np.array(mode(activities)[0], dtype=np.int32)
+        # activities = np.array(activities, dtype=np.int32)
         
         #convert to pytorch tensor
         images=torch.from_numpy(images).float()
