@@ -123,7 +123,7 @@ class CollectiveDataset(data.Dataset):
             
         else:
             if self.is_training:
-                sample_frames = random.sample(range(src_fid, src_fid + self.num_frames), self.num_frames)
+                sample_frames = list(range(src_fid, src_fid + self.num_frames))
                 return [(sid, src_fid, fid) for fid in sample_frames]
 
             else:
