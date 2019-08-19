@@ -23,6 +23,9 @@ from tensorboardX import SummaryWriter
 
 best_prec1 = 0
 
+def qc_image(input_image):
+    output_image = torchvision.utils.make_grid(input_image, normalize=True, scale_each=True)
+    return output_image
 
 def main():
     global args, best_prec1
@@ -225,6 +228,9 @@ def train(train_loader, model, criterion, optimizer, epoch, log, tf_writer):
         target = target.cuda()
         input_var = torch.autograd.Variable(input)
         target_var = torch.autograd.Variable(target)
+        
+        for j, batch in enumerate(input):
+            tf_writer.add_image('training_image', qc_image(batch), epoch*i*j)
 
         # compute output
         output = model(input_var)
