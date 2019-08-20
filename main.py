@@ -154,9 +154,9 @@ def main():
     test_frames=collective_all_frames(test_anns)
 
     train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (224, 224), args.num_frames, is_training=True),
-                                            batch_size=args.batch_size, shuffle=False)
+                                            batch_size=args.batch_size, shuffle=True)
     val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (224, 224), args.num_frames, is_training=True),
-                                        batch_size=args.batch_size, shuffle=False)
+                                        batch_size=args.batch_size, shuffle=True)
 
     # define loss function (criterion) and optimizer
     if args.loss_type == 'nll':
