@@ -74,7 +74,6 @@ def main():
     policies = model.get_optim_policies()
     train_augmentation = model.get_augmentation(flip=False if 'something' in args.dataset or 'jester' in args.dataset else True)
 
-    print(args.gpus)
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model = model.cuda()
@@ -154,9 +153,9 @@ def main():
     test_anns=collective_read_dataset(data_path, test_seqs, args.num_frames)
     test_frames=collective_all_frames(test_anns)
 
-    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_frames, is_training=True),
+    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (224, 224), args.num_frames, is_training=True),
                                             batch_size=args.batch_size, shuffle=False)
-    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_frames, is_training=True),
+    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (224, 224), args.num_frames, is_training=True),
                                         batch_size=args.batch_size, shuffle=False)
 
     # define loss function (criterion) and optimizer

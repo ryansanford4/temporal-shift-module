@@ -80,12 +80,13 @@ class CollectiveDataset(data.Dataset):
     """
     Characterize collective dataset for pytorch
     """
-    def __init__(self, anns, frames, images_path, image_size, num_frames=10, is_training=True, is_finetune=False):
+    def __init__(self, anns, frames, images_path, image_size, num_frames=10, num_segments=3, is_training=True, is_finetune=False):
         self.anns = anns
         self.frames = frames
         self.images_path = images_path
         self.image_size = image_size
-        
+        assert num_frames >= num_segments
+        self.num_segments = num_segments
         self.num_frames = num_frames
         
         self.is_training = is_training
@@ -123,12 +124,13 @@ class CollectiveDataset(data.Dataset):
             
         else:
             if self.is_training:
-                if src_fid <= int(self.num_frames / 2):
-                    sample_frames = list(range(src_fid, src_fid + self.num_frames))
-                elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
-                    sample_frames = list(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])))
-                else:
-                    sample_frames = list(range(src_fid - int(self.num_frames / 2), src_fid + int(self.num_frames / 2)))
+                sample_frames = random.sample(range(src_fid, src_fid + self.num_frames), self.num_segments)
+                # if src_fid <= int(self.num_frames / 2):
+                #     sample_frames = list(range(src_fid, src_fid + self.num_frames))
+                # elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
+                #     sample_frames = list(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])))
+                # else:
+                #     sample_frames = list(range(src_fid - int(self.num_frames / 2), src_fid + int(self.num_frames / 2)))
                 return [(sid, src_fid, fid) for fid in sample_frames]
 
             else:
@@ -153,7 +155,7 @@ class CollectiveDataset(data.Dataset):
 
             img = Image.open(self.images_path + '/seq%02d/frame%04d.jpg'%(sid,fid))
 
-            img=transforms.functional.resize(img,self.image_size)
+            img=transforms.functional.resize(img, self.image_size)
             img=np.array(img)
 
             # H,W,3 -> 3,H,W
