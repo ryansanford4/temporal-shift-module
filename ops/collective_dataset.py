@@ -123,7 +123,7 @@ class CollectiveDataset(data.Dataset):
             
         else:
             if self.is_training:
-                if src_fid < int(self.num_frames / 2):
+                if src_fid <= int(self.num_frames / 2):
                     sample_frames = list(range(src_fid, src_fid + self.num_frames))
                 elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
                     sample_frames = list(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])))
