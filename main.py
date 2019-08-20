@@ -74,6 +74,7 @@ def main():
     policies = model.get_optim_policies()
     train_augmentation = model.get_augmentation(flip=False if 'something' in args.dataset or 'jester' in args.dataset else True)
 
+    print(args.gpus)
     model = torch.nn.DataParallel(model, device_ids=args.gpus).cuda()
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model = model.cuda()
