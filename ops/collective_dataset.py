@@ -124,13 +124,13 @@ class CollectiveDataset(data.Dataset):
             
         else:
             if self.is_training:
-                sample_frames = random.sample(range(src_fid, src_fid + self.num_frames), self.num_segments)
-                # if src_fid <= int(self.num_frames / 2):
-                #     sample_frames = list(range(src_fid, src_fid + self.num_frames))
-                # elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
-                #     sample_frames = list(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])))
-                # else:
-                #     sample_frames = list(range(src_fid - int(self.num_frames / 2), src_fid + int(self.num_frames / 2)))
+                # sample_frames = random.sample(range(src_fid, src_fid + self.num_frames), self.num_segments)
+                if src_fid <= int(self.num_frames / 2):
+                    sample_frames = random.sample(range(src_fid, src_fid + self.num_frames), self.num_segments)
+                elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
+                    sample_frames = random.sample(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])), self.num_segments)
+                else:
+                    sample_frames = random.sample(range(src_fid - int(self.num_frames / 2), src_fid + int(self.num_frames / 2)), self.num_segments)
                 return [(sid, src_fid, fid) for fid in sample_frames]
 
             else:
