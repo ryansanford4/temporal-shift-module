@@ -53,6 +53,8 @@ parser.add_argument('--eval-freq', '-ef', default=5, type=int,
 # ========================= Runtime Configs ==========================
 parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
+parser.add_argument('-f', '--num_frames', default=8, type=int,
+                    help='number of frames to use (default: 8)')
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',

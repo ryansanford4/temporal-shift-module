@@ -67,10 +67,10 @@ def collective_read_annotations(path, sid, num_frames=10):
             }
     return annotations
             
-def collective_read_dataset(path, seqs):
+def collective_read_dataset(path, seqs, num_frames=10):
     data = {}
     for sid in seqs:
-        data[sid] = collective_read_annotations(path,sid)
+        data[sid] = collective_read_annotations(path, sid, num_frames)
     return data
 
 def collective_all_frames(anns):
@@ -123,7 +123,12 @@ class CollectiveDataset(data.Dataset):
             
         else:
             if self.is_training:
-                sample_frames = list(range(src_fid, src_fid + self.num_frames))
+                if src_fid < int(self.num_frames / 2):
+                    sample_frames = list(range(src_fid, src_fid + self.num_frames))
+                elif src_fid + int(self.num_frames / 2) > FRAMES_NUM[sid]:
+                    sample_frames = list(range(src_fid - (src_fid + int(self.num_frames / 2) - FRAMES_NUM[sid])))
+                else:
+                    sample_frames = list(range(src_fid - int(self.num_frames / 2), src_fid + int(self.num_frames / 2)))
                 return [(sid, src_fid, fid) for fid in sample_frames]
 
             else:

@@ -147,15 +147,15 @@ def main():
     test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29]
     train_seqs=[s for s in range(1,45) if s not in test_seqs]
 
-    train_anns = collective_read_dataset(data_path, train_seqs)
+    train_anns = collective_read_dataset(data_path, train_seqs, args.num_frames)
     train_frames = collective_all_frames(train_anns)
 
-    test_anns=collective_read_dataset(data_path, test_seqs)
+    test_anns=collective_read_dataset(data_path, test_seqs, args.num_frames)
     test_frames=collective_all_frames(test_anns)
 
-    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_segments, is_training=True),
+    train_loader = torch.utils.data.DataLoader(CollectiveDataset(train_anns, train_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_frames, is_training=True),
                                             batch_size=args.batch_size, shuffle=False)
-    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_segments, is_training=True),
+    val_loader = torch.utils.data.DataLoader(CollectiveDataset(test_anns, test_frames, data_path, (args.img_feature_dim, args.img_feature_dim), args.num_frames, is_training=True),
                                         batch_size=args.batch_size, shuffle=False)
 
     # define loss function (criterion) and optimizer
