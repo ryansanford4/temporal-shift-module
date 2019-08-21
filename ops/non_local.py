@@ -7,7 +7,7 @@ from torch.nn import functional as F
 
 
 class _NonLocalBlockND(nn.Module):
-    def __init__(self, in_channels, inter_channels=None, dimension=3, sub_sample=True, bn_layer=True):
+    def __init__(self, in_channels, inter_channels=None, dimension=2, sub_sample=True, bn_layer=True):
         super(_NonLocalBlockND, self).__init__()
 
         assert dimension in [1, 2, 3]
